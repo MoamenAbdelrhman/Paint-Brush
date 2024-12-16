@@ -45,6 +45,7 @@ public class MyPaintBrush {
         panel.add(checkbox("Filled", painter));
         panel.add(checkbox("Dotted", painter));
         panel.add(actionButton("Undo", painter));
+        panel.add(actionButton("Redo", painter));
         panel.add(actionButton("ClearAll", painter));
 
         return panel;
@@ -67,17 +68,35 @@ public class MyPaintBrush {
     }
 
     // Helper method to create checkboxes
+    // Helper method to create checkboxes
     private static JCheckBox checkbox(String text, MyPainter painter) {
         JCheckBox checkbox = new JCheckBox(text);
         checkbox.addItemListener(e -> {
             if (text.equals("Filled")) {
                 painter.setFilled(checkbox.isSelected());
+                if (checkbox.isSelected()) {
+                    painter.setDotted(false); // Uncheck Dotted if Filled is selected
+                    for (Component comp : checkbox.getParent().getComponents()) {
+                        if (comp instanceof JCheckBox && ((JCheckBox) comp).getText().equals("Dotted")) {
+                            ((JCheckBox) comp).setSelected(false);
+                        }
+                    }
+                }
             } else if (text.equals("Dotted")) {
                 painter.setDotted(checkbox.isSelected());
+                if (checkbox.isSelected()) {
+                    painter.setFilled(false); // Uncheck Filled if Dotted is selected
+                    for (Component comp : checkbox.getParent().getComponents()) {
+                        if (comp instanceof JCheckBox && ((JCheckBox) comp).getText().equals("Filled")) {
+                            ((JCheckBox) comp).setSelected(false);
+                        }
+                    }
+                }
             }
         });
         return checkbox;
     }
+
 
     // Helper method to create action buttons
     private static JButton actionButton(String text, MyPainter painter) {
@@ -87,6 +106,8 @@ public class MyPaintBrush {
                 painter.clearAll();
             } else if (text.equals("Undo")) {
                 painter.undo();
+            } else if (text.equals("Redo")) {
+                painter.redo(); // Handle redo action
             }
         });
         return button;
